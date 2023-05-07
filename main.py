@@ -20,8 +20,22 @@ response = requests.get(url, verify=False)
 # parse the HTML response using BeautifulSoup
 soup = BeautifulSoup(response.content, "html.parser")
 
-
 website_name = url.split("//")[1].split(".")[0]
+
+# find all links on the page
+links = []
+for link in soup.find_all("a"):
+    href = link.get("href")
+    if href:
+        links.append(href)
+
+# save all links to a CSV file
+all_links_file_name = f"{website_name}_all_links.csv"
+with open(all_links_file_name, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Links"])
+    for link in links:
+        writer.writerow([link])
 
 # find all links on the page that point to File files
 file_links = []
@@ -31,17 +45,23 @@ for link in soup.find_all("a"):
         file_links.append(href)
 
 # save the File links to a CSV file
-file_name = f"{website_name}.csv"
-with open(file_name, "w", newline="") as f:
+file_links_file_name = f"{website_name}_file_links.csv"
+with open(file_links_file_name, "w", newline="") as f:
     writer = csv.writer(f)
-    writer.writerow(["File Links"])
+    writer.writerow([f"{file_ext.upper()} Links"])
     for link in file_links:
         writer.writerow([link])
 
 # print out the File links
-print("File links found on the website:")
+print(f"{file_ext.upper()} links found on the website:")
 for link in file_links:
     print(link)
 
+print(f"{file_ext.upper()} links saved to {os.path.abspath(file_links_file_name)}")
 
-print(f"File links saved to {os.path.abspath(file_name)}")
+# print out all links
+print("All links found on the website:")
+for link in links:
+    print(link)
+
+print(f"All links saved to {os.path.abspath(all_links_file_name)}")
