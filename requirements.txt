@@ -1,0 +1,5 @@
+requests
+BeautifulSoup
+csv
+urllib.parse
+warnings
