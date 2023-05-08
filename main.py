@@ -14,28 +14,12 @@ warnings.filterwarnings("ignore", message="Unverified HTTPS request")
 if not urllib.parse.urlparse(url).scheme:
     url = "https://" + url
 
-    
 response = requests.get(url, verify=False)
 
 # parse the HTML response using BeautifulSoup
 soup = BeautifulSoup(response.content, "html.parser")
 
 website_name = url.split("//")[1].split(".")[0]
-
-# find all links on the page
-links = []
-for link in soup.find_all("a"):
-    href = link.get("href")
-    if href:
-        links.append(href)
-
-# save all links to a CSV file
-all_links_file_name = f"{website_name}_all_links.csv"
-with open(all_links_file_name, "w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerow(["Links"])
-    for link in links:
-        writer.writerow([link])
 
 # find all links on the page that point to File files
 file_links = []
@@ -59,9 +43,30 @@ for link in file_links:
 
 print(f"{file_ext.upper()} links saved to {os.path.abspath(file_links_file_name)}")
 
-# print out all links
-print("All links found on the website:")
-for link in links:
-    print(link)
+# ask the user if they want to scrape all links
+scrape_all_links = input("Do you want to scrape all links on the website? (y/n): ").lower()
 
-print(f"All links saved to {os.path.abspath(all_links_file_name)}")
+if scrape_all_links == 'y':
+    # find all links on the page
+    links = []
+    for link in soup.find_all("a"):
+        href = link.get("href")
+        if href:
+            links.append(href)
+
+    # save all links to a CSV file
+    all_links_file_name = f"{website_name}_all_links.csv"
+    with open(all_links_file_name, "w", newline="") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Links"])
+        for link in links:
+            writer.writerow([link])
+
+    # print out all links
+    print("All links found on the website:")
+    for link in links:
+        print(link)
+
+    print(f"All links saved to {os.path.abspath(all_links_file_name)}")
+else:
+    print("All links not scraped.")
